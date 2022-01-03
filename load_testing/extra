@@ -1,0 +1,197 @@
+import time
+from asyncio import AbstractEventLoopPolicy
+from timeit import default_timer
+import aiohttp
+import requests
+from django.shortcuts import render, redirect
+import asyncio
+from django.views.generic import CreateView
+from concurrent.futures import ThreadPoolExecutor
+
+# START_TIME = default_timer()
+#
+#
+# def requesting(session, i):
+#     url = "https://www.google.com/"
+#     response = requests.get(url)
+#     with response:
+#         data = response.elapsed
+#         print(f"data --- > {i}----->{data}")
+
+# async def start_async_process():
+#     with ThreadPoolExecutor(max_workers=500) as executor:
+#         with requests.Session() as session:
+#             loop = asyncio.get_event_loop()
+#             for i in range(500):
+#                 loop.run_in_executor(executor, requesting, *(session, i))
+
+
+# if __name__ == '__main__':
+#     future = asyncio.ensure_future(start_async_process())
+#     loop = asyncio.get_event_loop()
+#     loop.run_until_complete(future)
+
+
+# from aiohttp import ClientSession
+# import asyncio
+#
+#
+# async def hello(url, q):
+#     print(q)
+#     a = requests.get(url)
+#     print(a.elapsed)
+#
+#
+# loop = asyncio.get_event_loop()
+# tasks = []
+# url = "https://www.google.com"
+# for i in range(500):
+#     q = i
+#     task = asyncio.ensure_future(hello(url.format(i), q))
+#     tasks.append(task)
+#     print(task)
+#     print(tasks)
+# loop.run_until_complete(asyncio.wait(tasks))
+
+
+# import asyncio
+# from aiohttp import ClientSession
+#
+#
+# async def fetch(url, session):
+#     async with session.get(url) as response:
+#         delay = response.headers.get("DELAY")
+#         date = response.headers.get("DATE")
+#         print("{}:{} with delay {}".format(date, response.url, delay))
+#         return await response.read()
+#
+#
+# async def bound_fetch(sem, url, session):
+#     async with sem:
+#         await fetch(url, session)
+#
+#
+# async def run(r):
+#     url = "https://httpbin.org/get"
+#     tasks = []
+#     sem = asyncio.Semaphore(1)
+#
+#     async with ClientSession() as session:
+#         for i in range(r):
+#             task = asyncio.ensure_future(bound_fetch(sem, url.format(i), session))
+#             tasks.append(task)
+#         responses = asyncio.gather(*tasks)
+#         await responses
+#
+#
+# number = 1
+#
+# # a = asyncio.set_event_loop_policy(AbstractEventLoopPolicy())
+# # print("a", a)
+# loop = asyncio.get_event_loop()
+# future = asyncio.ensure_future(run(number))
+# loop.run_until_complete(future)
+
+
+# async def print_numbers():
+#     for i in range(10):
+#         print("i", i)
+#         await asyncio.sleep(0.25)
+#
+#
+# async def checker():
+#     print('start fetching')
+#     await asyncio.sleep(2)
+#     print('done fetching')
+#     return {'data': 1}
+#
+#
+# async def main():
+#     task1 = asyncio.create_task(checker())
+#     task2 = asyncio.create_task(print_numbers())
+#     value = await task1
+#     print(value)
+#     await task2
+#
+#
+# asyncio.run(main())
+
+*****************************************************************************
+
+async def send_(message: Message, client_session: aiohttp.ClientSession):
+    # async with client_session.post("https://www.google.co.in/",
+    #                                headers={
+    #                                    "Authorization": f"Bearer {API_KEY}"
+    #                                },
+    #
+    #                                json={
+    #                                    "to": message.to,
+    #                                    "from": message.from_,
+    #                                    "text": message.text
+    #                                }) as resp:
+
+    async with aiohttp.ClientSession() as session:
+        async with session.get("https://www.google.com/") as resp:
+            data = resp.status
+            # print(data)
+            print(message.text)
+            return data
+
+
+async def send(n):
+    async with aiohttp.ClientSession(loop=loop) as client_session:
+        for message in n:
+            await asyncio.create_task(send_(message, client_session))
+            await asyncio.sleep(1 / RATE_PER_SECOND)
+
+
+if __name__ == '__main__':
+    start = time()
+    # messages = [i for i in range(10)]
+    messages = [Message(to="+13125550000", from_="+12198416226", text=f"REQ : {str(i)}") for i in range(10)]
+    loop.run_until_complete(send(messages))
+    loop.close()
+    end = time()
+**************************************************************************************
+# @dataclass
+# class Message:
+#     to: str
+#     from_: str
+#     text: str
+#
+#
+# loop = asyncio.new_event_loop()
+#
+# RATE_PER_SECOND = 5
+#
+#
+# @dataclass
+# class Message:
+#     to: str
+#     from_: str
+#     text: str
+#
+#
+# async def send_(message: Message, client_session: aiohttp.ClientSession):
+#     async with client_session.get("https://www.google.com") as resp:
+#
+#         data = (resp.status, await resp.text())
+#         # print(data)
+#         print("GOT RESPONSE : ", message.text, "STATUS :", resp.status)
+#         return data
+#
+#
+# async def send(messages: List[Message]):
+#     async with aiohttp.ClientSession(loop=loop) as client_session:
+#         for message in messages:
+#             loop.create_task(send_(message, client_session))
+#             print("Scheduled : ", message.text)
+#             await asyncio.sleep(1 / RATE_PER_SECOND)
+#
+# if __name__ == '__main__':
+#     start = time()
+#     messages = [Message(to="+13125550000", from_="+12198416226", text=f"REQ : {str(i)}") for i in range(10)]
+#     a = loop.create_task(send(messages))
+#     loop.run_until_complete(a)
+#     end = time()
+#     print(end - start)

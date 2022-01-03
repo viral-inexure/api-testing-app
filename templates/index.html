@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>main</title>
+</head>
+<body>
+<form method="post" action="{% url 'index' %}">
+    {% csrf_token %}
+    <label for="api_holder">Enter a api here:</label><br><br>
+    <input type="text" id="api_holder" name="api_holder" placeholder="api here"><br><br>
+    <input type="submit">
+</form>
+</body>
+</html>
